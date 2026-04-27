@@ -14,6 +14,8 @@
   --open-bg:#EAF7F0;--open-cl:#085041;--open-bar:#1D9E75;
   --shut-bg:#FDECEA;--shut-cl:#8B1A1A;--shut-bar:#E24B4A;
   --merge-bg:#EDE9FE;--merge-cl:#5B21B6;--merge-bar:#7F77DD;
+  --review-bg:#FFF3CD;--review-cl:#7a4800;--review-bar:#F59E0B;
+  --net-bg:#DFF5E8;--net-cl:#1a5c32;--net-bar:#2D7D46;
   --r:10px;--gap:12px;--pad:24px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -28,28 +30,53 @@ body{font-family:'Segoe UI','Tahoma',Arial,'Angsana New',sans-serif;background:v
 .hdr-meta{text-align:right;color:rgba(255,255,255,.35);font-size:10px;line-height:1.9;flex-shrink:0}
 .hdr-meta strong{color:var(--goldlt);display:block;font-size:10.5px}
 
-/* KPI clickable */
-.kpi.clickable{cursor:pointer}
-.kpi.clickable:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(0,32,96,.13);border-color:#b8c8e8}
-.kpi.k-net::after{background:#2D7D46}
-.k-net .kpi-num{color:#1a5c32}
-.k-net .kpi-badge{background:#DFF5E8;color:#1a5c32}
+/* KPI STRIP — two rows */
+.kpi-strip{display:grid;gap:10px;padding:14px var(--pad) 0;grid-template-columns:repeat(4,1fr)}
+/* row 1: col 1-4 = total / new / old / review */
+/* row 2: col 1 = old-net spans, col 2-4 = net / open / shut */
 
 /* KPI */
-.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;padding:14px var(--pad) 0}
 .kpi{background:var(--white);border:0.5px solid var(--border);border-radius:var(--r);padding:12px 14px;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.kpi.clickable{cursor:pointer}
+.kpi.clickable:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(0,32,96,.13);border-color:#b8c8e8}
 .kpi:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(0,32,96,.1)}
 .kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.kpi.k-tot::after{background:var(--navy)}.kpi.k-new::after{background:var(--new-bar)}
-.kpi.k-old::after{background:var(--old-bar)}.kpi.k-opn::after{background:var(--open-bar)}.kpi.k-sht::after{background:var(--shut-bar)}
+.kpi.k-tot::after{background:var(--navy)}
+.kpi.k-new::after{background:var(--new-bar)}
+.kpi.k-old::after{background:var(--old-bar)}
+.kpi.k-review::after{background:var(--review-bar)}
+.kpi.k-oldnet::after{background:#8B6914}
+.kpi.k-net::after{background:var(--net-bar)}
+.kpi.k-opn::after{background:var(--open-bar)}
+.kpi.k-sht::after{background:var(--shut-bar)}
+
 .kpi-lbl{font-size:10px;font-weight:600;color:var(--gray);margin-bottom:3px}
 .kpi-num{font-size:32px;font-weight:800;line-height:1;letter-spacing:-1px}
-.k-tot .kpi-num{color:var(--navy)}.k-new .kpi-num{color:#185FA5}
-.k-old .kpi-num{color:#7a5500}.k-opn .kpi-num{color:#0F6E56}.k-sht .kpi-num{color:#A32D2D}
-.kpi-sub{font-size:9.5px;color:var(--gray);margin-top:3px}
+.k-tot .kpi-num{color:var(--navy)}
+.k-new .kpi-num{color:#185FA5}
+.k-old .kpi-num{color:#7a5500}
+.k-review .kpi-num{color:#7a4800}
+.k-oldnet .kpi-num{color:#5a3e00}
+.k-net .kpi-num{color:#1a5c32}
+.k-opn .kpi-num{color:#0F6E56}
+.k-sht .kpi-num{color:#A32D2D}
+.kpi-sub{font-size:9.5px;color:var(--gray);margin-top:3px;line-height:1.4}
 .kpi-badge{position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px}
-.k-new .kpi-badge{background:var(--new-bg);color:var(--new-cl)}.k-old .kpi-badge{background:var(--old-bg);color:var(--old-cl)}
-.k-opn .kpi-badge{background:var(--open-bg);color:var(--open-cl)}.k-sht .kpi-badge{background:var(--shut-bg);color:var(--shut-cl)}
+.k-new .kpi-badge{background:var(--new-bg);color:var(--new-cl)}
+.k-old .kpi-badge{background:var(--old-bg);color:var(--old-cl)}
+.k-review .kpi-badge{background:var(--review-bg);color:var(--review-cl)}
+.k-oldnet .kpi-badge{background:#FFF3CD;color:#5a3e00}
+.k-net .kpi-badge{background:var(--net-bg);color:var(--net-cl)}
+.k-opn .kpi-badge{background:var(--open-bg);color:var(--open-cl)}
+.k-sht .kpi-badge{background:var(--shut-bg);color:var(--shut-cl)}
+
+/* flow arrow between KPI groups */
+.kpi-arrow{display:flex;align-items:center;justify-content:center;color:#b0bbc8;font-size:18px;font-weight:300;padding:0 2px;align-self:center}
+
+/* divider row label */
+.kpi-divider{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:2px 0 0}
+.kpi-divider span{font-size:9px;font-weight:700;color:var(--gray);white-space:nowrap;letter-spacing:.5px;text-transform:uppercase}
+.kpi-divider hr{flex:1;border:none;border-top:0.5px solid var(--border)}
 
 /* LAYOUT */
 .wrap{padding:var(--gap) var(--pad);display:grid;gap:var(--gap)}
@@ -103,13 +130,9 @@ body{font-family:'Segoe UI','Tahoma',Arial,'Angsana New',sans-serif;background:v
 /* SVG CHARTS */
 .svg-chart-wrap{width:100%;overflow:hidden}
 .svg-chart-wrap svg{width:100%;display:block}
-.bar-label{font-size:10.5px;font-weight:700;fill:var(--navy)}
-.bar-val{font-size:9.5px;fill:#555}
 .chart-legend{display:flex;gap:14px;padding:6px 14px 10px;flex-wrap:wrap}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--dark)}
 .leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-.bar-group{cursor:pointer}
-.bar-group:hover rect{opacity:.85}
 
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,20,60,.42);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s}
@@ -139,13 +162,13 @@ body{font-family:'Segoe UI','Tahoma',Arial,'Angsana New',sans-serif;background:v
   .kpi-num{font-size:26px}
   .row-main{grid-template-columns:1fr}
   .hdr-meta{display:none}
-  .kpi-strip{grid-template-columns:repeat(3,1fr)}
+  .kpi-strip{grid-template-columns:repeat(4,1fr)}
 }
 @media(max-width:768px){
   .hdr{flex-direction:column;align-items:flex-start;gap:4px;padding:10px 14px}
   .hdr h1{font-size:16px}
   :root{--pad:14px}
-  .kpi-strip{grid-template-columns:repeat(3,1fr)}
+  .kpi-strip{grid-template-columns:repeat(2,1fr)}
   .kpi-num{font-size:24px}
   .kpi-lbl,.kpi-sub{font-size:9px}
   .footer{flex-direction:column;gap:2px;text-align:center;padding:8px 14px}
@@ -156,7 +179,6 @@ body{font-family:'Segoe UI','Tahoma',Arial,'Angsana New',sans-serif;background:v
 }
 @media(max-width:480px){
   .kpi-strip{grid-template-columns:repeat(2,1fr)}
-  .kpi.k-tot{grid-column:1/-1}
   .kpi-num{font-size:22px}
   :root{--pad:10px;--gap:9px}
   .ptbl th:nth-child(4),.ptbl td:nth-child(4){display:none}
@@ -176,19 +198,83 @@ body{font-family:'Segoe UI','Tahoma',Arial,'Angsana New',sans-serif;background:v
   <div class="hdr-meta"><strong>CDO Meeting ครั้งที่ 1/2569</strong>1 พฤษภาคม 2569<br>ข้อมูล ณ ปีงบประมาณ 2569</div>
 </div>
 
-<!-- KPI -->
+<!-- KPI strip — 2 rows of 4 -->
 <div class="kpi-strip">
-  <div class="kpi k-tot clickable" id="kpi-tot" title="คลิกเพื่อดูรายการทั้งหมด"><div class="kpi-lbl">ชุดข้อมูลทั้งหมด</div><div class="kpi-num">50</div><div class="kpi-sub">ชุดข้อมูล · 16 กระบวนการ</div></div>
-  <div class="kpi k-new clickable" id="kpi-new" title="คลิกเพื่อดูรายการ"><span class="kpi-badge">58%</span><div class="kpi-lbl">ชุดข้อมูลใหม่</div><div class="kpi-num">29</div><div class="kpi-sub">ชุดข้อมูลที่จัดทำใหม่</div></div>
-  <div class="kpi k-old clickable" id="kpi-old" title="คลิกเพื่อดูรายการ"><span class="kpi-badge">42%</span><div class="kpi-lbl">ชุดข้อมูลเดิม</div><div class="kpi-num">21</div><div class="kpi-sub">ชุดข้อมูลที่มีอยู่แล้ว</div></div>
-  <div class="kpi k-opn clickable" id="kpi-opn" title="คลิกเพื่อดูรายการ"><span class="kpi-badge">74%</span><div class="kpi-lbl">เปิดเผยได้</div><div class="kpi-num">37</div><div class="kpi-sub">ข้อมูลเผยแพร่</div></div>
-  <div class="kpi k-sht clickable" id="kpi-sht" title="คลิกเพื่อดูรายการ"><span class="kpi-badge">16%</span><div class="kpi-lbl">ไม่เปิดเผย</div><div class="kpi-num">8</div><div class="kpi-sub">ข้อมูลลับ / ความมั่นคง</div></div>
-  <div class="kpi k-net clickable" id="kpi-net" title="คลิกเพื่อดูรายการ"><span class="kpi-badge">90%</span><div class="kpi-lbl">คงเหลือสุทธิ</div><div class="kpi-num">45</div><div class="kpi-sub">หลังหักเสนอรวม 5 ชุด</div></div>
+
+  <!-- ROW 1: ภาพรวม -->
+  <div class="kpi-divider"><hr><span>ภาพรวมชุดข้อมูล</span><hr></div>
+
+  <!-- ชุดข้อมูลทั้งหมด -->
+  <div class="kpi k-tot clickable" id="kpi-tot" title="คลิกเพื่อดูรายการทั้งหมด">
+    <div class="kpi-lbl">ชุดข้อมูลทั้งหมด</div>
+    <div class="kpi-num">50</div>
+    <div class="kpi-sub">16 กระบวนการทำงาน</div>
+  </div>
+
+  <!-- ชุดข้อมูลใหม่ -->
+  <div class="kpi k-new clickable" id="kpi-new" title="คลิกเพื่อดูรายการ">
+    <span class="kpi-badge">58%</span>
+    <div class="kpi-lbl">ชุดข้อมูลใหม่</div>
+    <div class="kpi-num">29</div>
+    <div class="kpi-sub">จัดทำเพิ่มเติม</div>
+  </div>
+
+  <!-- ชุดข้อมูลเดิม -->
+  <div class="kpi k-old clickable" id="kpi-old" title="คลิกเพื่อดูรายการ">
+    <span class="kpi-badge">42%</span>
+    <div class="kpi-lbl">ชุดข้อมูลเดิม</div>
+    <div class="kpi-num">21</div>
+    <div class="kpi-sub">มีอยู่แล้ว</div>
+  </div>
+
+  <!-- ทบทวนซ้ำซ้อน (เสนอรวม) -->
+  <div class="kpi k-review clickable" id="kpi-review" title="คลิกเพื่อดูรายการ">
+    <span class="kpi-badge">10%</span>
+    <div class="kpi-lbl">ทบทวน ซ้ำซ้อน</div>
+    <div class="kpi-num">5</div>
+    <div class="kpi-sub">ชุดข้อมูลเดิม เสนอรวม</div>
+  </div>
+
+  <!-- ROW 2: สรุปและการเปิดเผย -->
+  <div class="kpi-divider"><hr><span>สรุปและการเปิดเผย</span><hr></div>
+
+  <!-- คงเหลือชุดข้อมูลเดิม -->
+  <div class="kpi k-oldnet clickable" id="kpi-oldnet" title="คลิกเพื่อดูรายการ">
+    <span class="kpi-badge">32%</span>
+    <div class="kpi-lbl">คงเหลือชุดข้อมูลเดิม</div>
+    <div class="kpi-num">16</div>
+    <div class="kpi-sub">เดิม 21 หัก ซ้ำซ้อน 5</div>
+  </div>
+
+  <!-- คงเหลือสุทธิรวม -->
+  <div class="kpi k-net clickable" id="kpi-net" title="คลิกเพื่อดูรายการ">
+    <span class="kpi-badge">90%</span>
+    <div class="kpi-lbl">คงเหลือสุทธิรวม</div>
+    <div class="kpi-num">45</div>
+    <div class="kpi-sub">ใหม่ 29 + เดิม 16</div>
+  </div>
+
+  <!-- เปิดเผยได้ -->
+  <div class="kpi k-opn clickable" id="kpi-opn" title="คลิกเพื่อดูรายการ">
+    <span class="kpi-badge">82%</span>
+    <div class="kpi-lbl">เปิดเผยได้</div>
+    <div class="kpi-num">37</div>
+    <div class="kpi-sub">จาก 45 ชุดสุทธิ</div>
+  </div>
+
+  <!-- ไม่เปิดเผย -->
+  <div class="kpi k-sht clickable" id="kpi-sht" title="คลิกเพื่อดูรายการ">
+    <span class="kpi-badge">18%</span>
+    <div class="kpi-lbl">ไม่เปิดเผย</div>
+    <div class="kpi-num">8</div>
+    <div class="kpi-sub">ข้อมูลลับ / ความมั่นคง</div>
+  </div>
+
 </div>
 
 <!-- MAIN -->
 <div class="wrap row-main" style="padding-bottom:16px">
-  <!-- LEFT: stacked cards (ข้อเสนอ + charts) -->
+  <!-- LEFT: stacked cards -->
   <div style="display:flex;flex-direction:column;gap:12px">
     <!-- ข้อเสนอ -->
     <div class="card">
@@ -206,7 +292,7 @@ body{font-family:'Segoe UI','Tahoma',Arial,'Angsana New',sans-serif;background:v
     </div>
     <!-- SVG Chart: disclosure by owner -->
     <div class="card">
-      <div class="ch"><h3>การเปิดเผยชุดข้อมูล แยกตามหน่วยงาน</h3></div>
+      <div class="ch"><h3>การเปิดเผยชุดข้อมูล แยกตามหน่วยงาน</h3><span class="ch-hint">คลิกดูรายชื่อ</span></div>
       <div class="svg-chart-wrap" id="ownerDiscWrap"></div>
       <div class="chart-legend">
         <div class="leg-item"><div class="leg-dot" style="background:var(--open-bar)"></div>เปิดเผย</div>
@@ -377,7 +463,7 @@ PROCS.forEach(p=>{
 
 // ════ PROPOSAL LIST ════
 const pl=document.getElementById('propList');
-const TOTAL_ALL=ALL.length; // 50 — use absolute scale so bars are proportional
+const TOTAL_ALL=ALL.length;
 PROPS.forEach(p=>{
   const color=PCOLORS[p.label]||'#888';
   const div=document.createElement('div');div.className='prop-item';
@@ -391,7 +477,6 @@ PROPS.forEach(p=>{
 });
 
 // ════ SVG CHARTS ════
-// store click callbacks by chart id to avoid inline toString issues
 const _chartCallbacks={};
 
 function makeSvgBarChart(containerId, rows, datasets, colors, onBarClick, sharedMax) {
@@ -414,12 +499,10 @@ function makeSvgBarChart(containerId, rows, datasets, colors, onBarClick, shared
       segs.push({v,bw,di,xOff,color:colors[di]});
       xOff+=bw;
     });
-    // draw bars — use data-* attributes for click, no inline function
     segs.forEach(s=>{
       const clickable=onBarClick?`data-cid="${containerId}" data-lbl="${lbl.replace(/"/g,'&quot;')}" data-di="${s.di}" style="cursor:pointer"`:'';
       svg+=`<rect class="svg-bar" x="${s.xOff}" y="${y}" width="${s.bw}" height="${BAR_H}" fill="${s.color}" rx="3" ${clickable}/>`;
     });
-    // labels
     segs.forEach(s=>{
       if(s.bw>=24){
         svg+=`<text x="${s.xOff+s.bw/2}" y="${y+BAR_H/2+4}" text-anchor="middle" font-size="9.5" fill="white" font-weight="700" pointer-events="none">${s.v}</text>`;
@@ -433,7 +516,7 @@ function makeSvgBarChart(containerId, rows, datasets, colors, onBarClick, shared
     `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">${svg}</svg>`;
 }
 
-// single delegated listener for all SVG bar clicks
+// delegated click for SVG bars
 document.addEventListener('click',function(e){
   const bar=e.target.closest('.svg-bar[data-cid]');
   if(!bar) return;
@@ -444,13 +527,12 @@ document.addEventListener('click',function(e){
   if(cb) cb(lbl,di);
 });
 
-// compute shared max across BOTH charts so scales match
 const SHARED_MAX = Math.max(
-  ...OWNERS.map(t => OMAP[t].n + OMAP[t].old),      // type chart totals
-  ...OWNERS.map(t => OMAP[t].opn + OMAP[t].sht + OMAP[t].merg) // disc chart totals
+  ...OWNERS.map(t => OMAP[t].n + OMAP[t].old),
+  ...OWNERS.map(t => OMAP[t].opn + OMAP[t].sht + OMAP[t].merg)
 );
 
-// Owner type chart (clickable)
+// Owner type chart
 makeSvgBarChart(
   'ownerTypeWrap',
   OWNERS,
@@ -464,13 +546,19 @@ makeSvgBarChart(
   SHARED_MAX
 );
 
-// Owner disclosure chart (same scale)
+// Owner disclosure chart — NOW CLICKABLE
 makeSvgBarChart(
   'ownerDiscWrap',
   OWNERS,
   [OWNERS.map(t=>OMAP[t].opn), OWNERS.map(t=>OMAP[t].sht), OWNERS.map(t=>OMAP[t].merg)],
   ['#1D9E75','#E24B4A','#7F77DD'],
-  null,
+  function(tag,dsIdx){
+    const discLabels=['เปิดเผย','ไม่เปิดเผย','เสนอรวม'];
+    const discFilter=discLabels[dsIdx];
+    const discColors=['#1D9E75','#E24B4A','#7F77DD'];
+    const items=ALL.filter(d=>d.owner===tag&&d.disc===discFilter);
+    if(items.length)openModal(tag+' — '+discFilter,items,discColors[dsIdx]);
+  },
   SHARED_MAX
 );
 
@@ -497,16 +585,18 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementB
 
 // ════ KPI DRILLDOWN ════
 const kpiDefs = [
-  {id:'kpi-tot', label:'ชุดข้อมูลทั้งหมด',  color:'#002060', filter: ()=>ALL},
-  {id:'kpi-new', label:'ชุดข้อมูลใหม่',      color:'#378ADD', filter: ()=>ALL.filter(d=>d.type==='ชุดข้อมูลใหม่')},
-  {id:'kpi-old', label:'ชุดข้อมูลเดิม',      color:'#C9A227', filter: ()=>ALL.filter(d=>d.type==='ชุดข้อมูลเดิม')},
-  {id:'kpi-opn', label:'เปิดเผยได้',          color:'#1D9E75', filter: ()=>ALL.filter(d=>d.disc==='เปิดเผย')},
-  {id:'kpi-sht', label:'ไม่เปิดเผย',          color:'#E24B4A', filter: ()=>ALL.filter(d=>d.disc==='ไม่เปิดเผย')},
-  {id:'kpi-net', label:'ชุดข้อมูลคงเหลือสุทธิ (หลังหักเสนอรวม)', color:'#2D7D46', filter: ()=>ALL.filter(d=>d.disc!=='เสนอรวม')},
+  {id:'kpi-tot',    label:'ชุดข้อมูลทั้งหมด',              color:'#002060', filter:()=>ALL},
+  {id:'kpi-new',    label:'ชุดข้อมูลใหม่',                 color:'#378ADD', filter:()=>ALL.filter(d=>d.type==='ชุดข้อมูลใหม่')},
+  {id:'kpi-old',    label:'ชุดข้อมูลเดิม (ทั้งหมด)',       color:'#C9A227', filter:()=>ALL.filter(d=>d.type==='ชุดข้อมูลเดิม')},
+  {id:'kpi-review', label:'ชุดข้อมูลเดิม ทบทวน/ซ้ำซ้อน', color:'#F59E0B', filter:()=>ALL.filter(d=>d.proposal==='เสนอรวม')},
+  {id:'kpi-oldnet', label:'คงเหลือชุดข้อมูลเดิม',         color:'#8B6914', filter:()=>ALL.filter(d=>d.type==='ชุดข้อมูลเดิม'&&d.proposal!=='เสนอรวม')},
+  {id:'kpi-net',    label:'คงเหลือชุดข้อมูลสุทธิรวม',     color:'#2D7D46', filter:()=>ALL.filter(d=>d.disc!=='เสนอรวม')},
+  {id:'kpi-opn',    label:'เปิดเผยได้',                    color:'#1D9E75', filter:()=>ALL.filter(d=>d.disc==='เปิดเผย')},
+  {id:'kpi-sht',    label:'ไม่เปิดเผย',                    color:'#E24B4A', filter:()=>ALL.filter(d=>d.disc==='ไม่เปิดเผย')},
 ];
-kpiDefs.forEach(({id, label, color, filter})=>{
+kpiDefs.forEach(({id,label,color,filter})=>{
   const el=document.getElementById(id);
-  if(el) el.addEventListener('click',()=>openModal(label, filter(), color));
+  if(el) el.addEventListener('click',()=>openModal(label,filter(),color));
 });
 </script>
 </body>
