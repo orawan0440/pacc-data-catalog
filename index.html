@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>สถานะชุดข้อมูล สำนักงาน ป.ป.ท.</title>
+<style>
+:root{
+  --navy:#002060;--navy2:#001848;--navymd:#1a3d8f;
+  --gold:#C9A227;--goldlt:#E8C84A;--golddk:#9A7A10;
+  --white:#fff;--bg:#F4F6FA;--border:#dde4f0;--gray:#6B7A99;--dark:#1a2a4a;
+  --new-bg:#E6F1FB;--new-cl:#0C447C;--new-bar:#378ADD;
+  --old-bg:#FFF8E8;--old-cl:#7a5500;--old-bar:#C9A227;
+  --open-bg:#EAF7F0;--open-cl:#085041;--open-bar:#1D9E75;
+  --shut-bg:#FDECEA;--shut-cl:#8B1A1A;--shut-bar:#E24B4A;
+  --merge-bg:#EDE9FE;--merge-cl:#5B21B6;--merge-bar:#7F77DD;
+  --r:10px;--gap:12px;--pad:24px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI','Tahoma',Arial,'Angsana New',sans-serif;background:var(--bg);color:var(--dark);min-height:100vh;font-size:14px}
+
+/* HEADER */
+.g-bar{height:5px;background:linear-gradient(90deg,var(--golddk),var(--goldlt),var(--golddk))}
+.hdr{background:var(--navy2);display:flex;align-items:center;justify-content:space-between;padding:14px var(--pad) 12px;gap:16px}
+.hdr h1{color:#fff;font-size:20px;font-weight:800;line-height:1.3}
+.hdr h1 em{color:var(--goldlt);font-style:normal}
+.hdr-sub{color:rgba(255,255,255,.45);font-size:10.5px;margin-top:3px}
+.hdr-meta{text-align:right;color:rgba(255,255,255,.35);font-size:10px;line-height:1.9;flex-shrink:0}
+.hdr-meta strong{color:var(--goldlt);display:block;font-size:10.5px}
+
+/* KPI clickable */
+.kpi.clickable{cursor:pointer}
+.kpi.clickable:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(0,32,96,.13);border-color:#b8c8e8}
+.kpi.k-net::after{background:#2D7D46}
+.k-net .kpi-num{color:#1a5c32}
+.k-net .kpi-badge{background:#DFF5E8;color:#1a5c32}
+
+/* KPI */
+.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;padding:14px var(--pad) 0}
+.kpi{background:var(--white);border:0.5px solid var(--border);border-radius:var(--r);padding:12px 14px;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(0,32,96,.1)}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.k-tot::after{background:var(--navy)}.kpi.k-new::after{background:var(--new-bar)}
+.kpi.k-old::after{background:var(--old-bar)}.kpi.k-opn::after{background:var(--open-bar)}.kpi.k-sht::after{background:var(--shut-bar)}
+.kpi-lbl{font-size:10px;font-weight:600;color:var(--gray);margin-bottom:3px}
+.kpi-num{font-size:32px;font-weight:800;line-height:1;letter-spacing:-1px}
+.k-tot .kpi-num{color:var(--navy)}.k-new .kpi-num{color:#185FA5}
+.k-old .kpi-num{color:#7a5500}.k-opn .kpi-num{color:#0F6E56}.k-sht .kpi-num{color:#A32D2D}
+.kpi-sub{font-size:9.5px;color:var(--gray);margin-top:3px}
+.kpi-badge{position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px}
+.k-new .kpi-badge{background:var(--new-bg);color:var(--new-cl)}.k-old .kpi-badge{background:var(--old-bg);color:var(--old-cl)}
+.k-opn .kpi-badge{background:var(--open-bg);color:var(--open-cl)}.k-sht .kpi-badge{background:var(--shut-bg);color:var(--shut-cl)}
+
+/* LAYOUT */
+.wrap{padding:var(--gap) var(--pad);display:grid;gap:var(--gap)}
+.row-main{grid-template-columns:1fr 1.6fr}
+
+/* CARD */
+.card{background:var(--white);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden}
+.ch{padding:10px 15px 8px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ch h3{font-size:12px;font-weight:700;color:var(--navy);line-height:1.3}
+.ch-hint{font-size:9.5px;color:var(--gray);white-space:nowrap;flex-shrink:0}
+.cb{padding:12px 15px}
+
+/* PILLS */
+.pill{font-size:8px;font-weight:700;padding:2px 6px;border-radius:6px;display:inline-block;white-space:nowrap;line-height:1.4}
+.p-new{background:var(--new-bg);color:var(--new-cl)}.p-old{background:var(--old-bg);color:var(--old-cl)}
+.p-opn{background:var(--open-bg);color:var(--open-cl)}.p-sht{background:var(--shut-bg);color:var(--shut-cl)}
+.p-merge{background:var(--merge-bg);color:var(--merge-cl)}.p-gray{background:#f0f3f8;color:var(--gray)}
+
+/* PROCESS TABLE */
+.ptbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ptbl{width:100%;border-collapse:collapse;min-width:480px}
+.ptbl th{font-size:9px;font-weight:700;color:var(--gray);text-align:left;padding:0 7px 6px;border-bottom:0.5px solid var(--border);white-space:nowrap}
+.ptbl td{font-size:10.5px;padding:5px 7px;border-bottom:0.5px solid #f0f3f8;vertical-align:middle}
+.pr{cursor:pointer;transition:background .12s}.pr:hover td{background:#f5f8ff}.pr.active td{background:#EEF4FF}
+.pr-name{font-weight:600;color:var(--dark);line-height:1.3;max-width:230px}
+.bw{height:6px;background:#eaecf5;border-radius:3px;min-width:60px}
+.bf{height:100%;border-radius:3px;background:var(--navy)}
+.arrow{font-size:9px;color:#b0bbc8;transition:transform .2s;display:inline-block;margin-right:2px}
+.pr.active .arrow{transform:rotate(90deg);color:var(--navymd)}
+.dr{display:none}.dr.open{display:table-row}
+.dr-cell{padding:0 7px 8px!important;border-bottom:0.5px solid #dde8f8!important}
+.drill-inner{background:#f5f8ff;border-radius:7px;padding:8px 12px;display:flex;flex-direction:column;gap:3px}
+.di{display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:0.5px solid #e4eaf5}
+.di:last-child{border-bottom:none}
+.di-code{font-size:8.5px;font-weight:700;color:var(--golddk);min-width:118px;flex-shrink:0;padding-top:2px;line-height:1.3}
+.di-name{font-size:10px;color:var(--dark);flex:1;line-height:1.45}
+.di-tags{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;align-items:center}
+.di-merge{font-size:7.5px;color:var(--merge-cl);background:var(--merge-bg);border-radius:5px;padding:1px 5px}
+.di-own{font-size:9px;font-weight:700;color:var(--navymd);min-width:32px;text-align:right;padding-top:2px;flex-shrink:0}
+
+/* PROPOSAL */
+.prop-item{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;cursor:pointer;border:0.5px solid transparent;transition:background .12s;margin-bottom:4px}
+.prop-item:last-child{margin-bottom:0}
+.prop-item:hover{background:#f0f4ff;border-color:var(--border)}
+.prop-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.prop-lbl{flex:1;font-size:11px;font-weight:600;color:var(--dark);line-height:1.3}
+.prop-bar-bg{width:80px;height:7px;background:#e8ecf5;border-radius:3px;overflow:hidden;flex-shrink:0}
+.prop-bar-fill{height:100%;border-radius:3px}
+.prop-count{font-size:14px;font-weight:800;color:var(--navy);min-width:24px;text-align:right}
+
+/* SVG CHARTS */
+.svg-chart-wrap{width:100%;overflow:hidden}
+.svg-chart-wrap svg{width:100%;display:block}
+.bar-label{font-size:10.5px;font-weight:700;fill:var(--navy)}
+.bar-val{font-size:9.5px;fill:#555}
+.chart-legend{display:flex;gap:14px;padding:6px 14px 10px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--dark)}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.bar-group{cursor:pointer}
+.bar-group:hover rect{opacity:.85}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,20,60,.42);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--white);border-radius:12px;width:min(680px,93vw);max-height:84vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(10px);transition:transform .18s;box-shadow:0 20px 60px rgba(0,20,60,.25)}
+.overlay.open .modal{transform:translateY(0)}
+.mh{background:var(--navy);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.mh h4{color:#fff;font-size:13px;font-weight:700;border-left:3px solid var(--goldlt);padding-left:10px;line-height:1.3}
+.mclose{background:none;border:none;color:rgba(255,255,255,.5);font-size:18px;cursor:pointer;padding:0 6px;border-radius:4px;line-height:1;transition:color .12s}
+.mclose:hover{color:#fff}
+.mbody{overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:5px}
+.mi{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border-radius:7px;border:0.5px solid var(--border)}
+.mi-code{font-size:9px;font-weight:700;color:var(--golddk);min-width:118px;flex-shrink:0;padding-top:2px;line-height:1.3}
+.mi-name{font-size:11px;color:var(--dark);line-height:1.45;margin-bottom:3px}
+.mi-tags{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.mi-merge{font-size:8.5px;color:var(--merge-cl);margin-top:3px;display:block}
+.mi-proc{font-size:8px;color:var(--gray);margin-top:2px;display:block}
+
+/* FOOTER */
+.footer{background:var(--navy);padding:9px var(--pad);display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px}
+.footer span{color:rgba(255,255,255,.28);font-size:8.5px}
+.footer strong{color:rgba(255,255,255,.5);font-size:8.5px;text-align:center}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  :root{--pad:16px}
+  .kpi-num{font-size:26px}
+  .row-main{grid-template-columns:1fr}
+  .hdr-meta{display:none}
+  .kpi-strip{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:768px){
+  .hdr{flex-direction:column;align-items:flex-start;gap:4px;padding:10px 14px}
+  .hdr h1{font-size:16px}
+  :root{--pad:14px}
+  .kpi-strip{grid-template-columns:repeat(3,1fr)}
+  .kpi-num{font-size:24px}
+  .kpi-lbl,.kpi-sub{font-size:9px}
+  .footer{flex-direction:column;gap:2px;text-align:center;padding:8px 14px}
+  .footer span:first-child{display:none}
+  .modal{width:96vw;max-height:88vh}
+  .mi{flex-direction:column;gap:5px}
+  .mi-code{min-width:unset}
+}
+@media(max-width:480px){
+  .kpi-strip{grid-template-columns:repeat(2,1fr)}
+  .kpi.k-tot{grid-column:1/-1}
+  .kpi-num{font-size:22px}
+  :root{--pad:10px;--gap:9px}
+  .ptbl th:nth-child(4),.ptbl td:nth-child(4){display:none}
+  .prop-bar-bg{display:none}
+  .footer strong{font-size:7.5px}
+}
+</style>
+</head>
+<body>
+
+<div class="g-bar"></div>
+<div class="hdr">
+  <div>
+    <h1><em>สถานะชุดข้อมูล</em>สำนักงาน ป.ป.ท.</h1>
+    <div class="hdr-sub">Data Catalog Status — Office of Public Sector Anti-Corruption Commission (PACC)</div>
+  </div>
+  <div class="hdr-meta"><strong>CDO Meeting ครั้งที่ 1/2569</strong>1 พฤษภาคม 2569<br>ข้อมูล ณ ปีงบประมาณ 2569</div>
+</div>
+
+<!-- KPI -->
+<div class="kpi-strip">
+  <div class="kpi k-tot clickable" id="kpi-tot" title="คลิกเพื่อดูรายการทั้งหมด"><div class="kpi-lbl">ชุดข้อมูลทั้งหมด</div><div class="kpi-num">50</div><div class="kpi-sub">ชุดข้อมูล · 16 กระบวนการ</div></div>
+  <div class="kpi k-new clickable" id="kpi-new" title="คลิกเพื่อดูรายการ"><span class="kpi-badge">58%</span><div class="kpi-lbl">ชุดข้อมูลใหม่</div><div class="kpi-num">29</div><div class="kpi-sub">ชุดข้อมูลที่จัดทำใหม่</div></div>
+  <div class="kpi k-old clickable" id="kpi-old" title="คลิกเพื่อดูรายการ"><span class="kpi-badge">42%</span><div class="kpi-lbl">ชุดข้อมูลเดิม</div><div class="kpi-num">21</div><div class="kpi-sub">ชุดข้อมูลที่มีอยู่แล้ว</div></div>
+  <div class="kpi k-opn clickable" id="kpi-opn" title="คลิกเพื่อดูรายการ"><span class="kpi-badge">74%</span><div class="kpi-lbl">เปิดเผยได้</div><div class="kpi-num">37</div><div class="kpi-sub">ข้อมูลเผยแพร่</div></div>
+  <div class="kpi k-sht clickable" id="kpi-sht" title="คลิกเพื่อดูรายการ"><span class="kpi-badge">16%</span><div class="kpi-lbl">ไม่เปิดเผย</div><div class="kpi-num">8</div><div class="kpi-sub">ข้อมูลลับ / ความมั่นคง</div></div>
+  <div class="kpi k-net clickable" id="kpi-net" title="คลิกเพื่อดูรายการ"><span class="kpi-badge">90%</span><div class="kpi-lbl">คงเหลือสุทธิ</div><div class="kpi-num">45</div><div class="kpi-sub">หลังหักเสนอรวม 5 ชุด</div></div>
+</div>
+
+<!-- MAIN -->
+<div class="wrap row-main" style="padding-bottom:16px">
+  <!-- LEFT: stacked cards (ข้อเสนอ + charts) -->
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <!-- ข้อเสนอ -->
+    <div class="card">
+      <div class="ch"><h3>ข้อเสนอการจัดการชุดข้อมูล</h3><span class="ch-hint">คลิกเพื่อดูรายการ</span></div>
+      <div class="cb" style="padding:10px 12px" id="propList"></div>
+    </div>
+    <!-- SVG Chart: owner type -->
+    <div class="card">
+      <div class="ch"><h3>จำนวนชุดข้อมูลใหม่ / เดิม แยกตามหน่วยงาน</h3><span class="ch-hint">คลิกดูรายชื่อ</span></div>
+      <div class="svg-chart-wrap" id="ownerTypeWrap"></div>
+      <div class="chart-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--new-bar)"></div>ชุดข้อมูลใหม่</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--old-bar)"></div>ชุดข้อมูลเดิม</div>
+      </div>
+    </div>
+    <!-- SVG Chart: disclosure by owner -->
+    <div class="card">
+      <div class="ch"><h3>การเปิดเผยชุดข้อมูล แยกตามหน่วยงาน</h3></div>
+      <div class="svg-chart-wrap" id="ownerDiscWrap"></div>
+      <div class="chart-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--open-bar)"></div>เปิดเผย</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--shut-bar)"></div>ไม่เปิดเผย</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--merge-bar)"></div>เสนอรวม</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Process table -->
+  <div class="card">
+    <div class="ch"><h3>ชุดข้อมูลจำแนกตามกระบวนการทำงาน</h3><span class="ch-hint">▶ คลิกเพื่อดูรายชื่อ</span></div>
+    <div class="cb" style="padding:8px 12px">
+      <div class="ptbl-wrap">
+        <table class="ptbl">
+          <thead><tr>
+            <th style="width:18px"></th>
+            <th>กระบวนการทำงาน</th>
+            <th style="text-align:center">รวม</th>
+            <th style="min-width:80px">สัดส่วน</th>
+            <th>ประเภท</th>
+            <th>การเปิดเผย</th>
+          </tr></thead>
+          <tbody id="procBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>สำนักงานคณะกรรมการป้องกันและปราบปรามการทุจริตในภาครัฐ (ป.ป.ท.)</span>
+  <strong>CDO Meeting 1/2569 · วาระที่ 2.3 สถานะชุดข้อมูล ณ ปัจจุบัน</strong>
+  <span>Office of Public Sector Anti-Corruption Commission (PACC)</span>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="mh"><h4 id="mTitle">รายการชุดข้อมูล</h4><button class="mclose" onclick="closeModal(null)">✕</button></div>
+    <div class="mbody" id="mBody"></div>
+  </div>
+</div>
+
+<script>
+// ════ DATA ════
+const ALL=[
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_1_01',name:'ข้อมูลช่องทางรับเรื่องร้องเรียน สำนักงาน ป.ป.ท.',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_1_02',name:'ข้อมูลประเภทเรื่องที่ร้องเรียนหน่วยงานรัฐ',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_1_03',name:'ข้อมูลการกลั่นกรองเรื่องร้องเรียน พรบ.ปปท.',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_1_04',name:'ข้อมูลสถานะของการดำเนินการ',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_1_05',name:'ข้อมูลรายละเอียดเรื่องร้องเรียน',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'ไม่เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_2_06',name:'สถิติเรื่องที่ร้องเรียนตามประเภทเรื่อง',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_2_07',name:'สถิติการเรื่องร้องเรียนรายจังหวัด',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_2_08',name:'สถิติการรับเรื่องร้องเรียนรายช่องทาง',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_1_09',name:'ข้อมูลรายละเอียดการกลั่นกรองและมอบหมายเรื่องร้องเรียน',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'ไม่เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_2_10',name:'สถิติการกลั่นกรองและมอบหมายเรื่องร้องเรียน',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_2_11',name:'สถิติการพิจารณากลั่นกรองเรื่องร้องเรียน',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_2_12',name:'สถิติการมอบหมายหน่วยงานรับผิดชอบ',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_1_13',name:'ข้อมูลรายละเอียดการรายงานผลการดำเนินการ',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'ไม่เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_1_14',name:'ข้อมูลการรายงานผลการดำเนินการ',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_2_15',name:'สถิติผลการดำเนินการ จำแนกรายหน่วยงานรับผิดชอบ',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_2_16',name:'สถิติสรุปผลการตรวจสอบข้อเท็จจริง',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารจัดการเรื่องร้องเรียน',code:'pacc_04_01_2_17',name:'สถิติสรุปผลการตรวจสอบข้อเท็จจริง จำแนกรายหน่วยงานรับผิดชอบ',type:'ชุดข้อมูลใหม่',owner:'กบค.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'จัดทำสถิติข้อมูลสำนวนคดี',code:'pacc_04_02_2_01',name:'สถิติสำนวนคดี สำนักงาน ป.ป.ท. รายเดือน',type:'ชุดข้อมูลเดิม',owner:'กบค.',proposal:'คงเดิม',mw:'',disc:'เปิดเผย'},
+ {proc:'วิเคราะห์ข้อมูลทั่วไปภายในสำนักงาน ป.ป.ท.',code:'pacc_13_01_1_01',name:'ข้อมูลพื้นที่รับผิดชอบของสำนักงาน ป.ป.ท.',type:'ชุดข้อมูลใหม่',owner:'ศทส.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'วิเคราะห์ข้อมูลทั่วไปภายในสำนักงาน ป.ป.ท.',code:'pacc_13_01_1_02',name:'ข้อมูลการเลขสารบรรณภายใน สำนักงาน ป.ป.ท.',type:'ชุดข้อมูลใหม่',owner:'ศทส.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'วิเคราะห์ข้อมูลทั่วไปภายในสำนักงาน ป.ป.ท.',code:'pacc_13_01_1_03',name:'ข้อมูลหน่วยงานภาครัฐในความรับผิดชอบของสำนักงาน ป.ป.ท. ส่วนกลาง',type:'ชุดข้อมูลใหม่',owner:'ศทส.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'วิเคราะห์ข้อมูลทั่วไปภายในสำนักงาน ป.ป.ท.',code:'pacc_13_01_1_04',name:'ข้อมูลที่ตั้งของสำนักงาน ป.ป.ท.',type:'ชุดข้อมูลใหม่',owner:'ศทส.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'วิเคราะห์ข้อมูลทั่วไปภายในสำนักงาน ป.ป.ท.',code:'pacc_13_01_1_05',name:'ข้อมูลหน่วยงานตามกฎกระทรวงการแบ่งส่วนราชการของสำนักงาน ป.ป.ท.',type:'ชุดข้อมูลใหม่',owner:'ศทส.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'รวบรวมกฎหมาย ระเบียบและคำสั่งของสำนักงาน ป.ป.ท.',code:'pacc_02_01_1_01',name:'ข้อมูล กฎหมาย ระเบียบและคำสั่งของสำนักงาน ป.ป.ท.',type:'ชุดข้อมูลเดิม',owner:'กกม.',proposal:'คงเดิม',mw:'',disc:'เปิดเผย'},
+ {proc:'รายงานข้อร้องเรียนเจ้าหน้าที่รัฐกระทำการทุจริต ประพฤติมิชอบ',code:'pacc_12_01_1_01',name:'ส่วนราชการ รัฐวิสาหกิจและองค์การมหาชน ในสังกัดและกำกับ ศปท. ที่รายงานผลดำเนินการ',type:'ชุดข้อมูลเดิม',owner:'กอท.',proposal:'คงเดิม',mw:'',disc:'เปิดเผย'},
+ {proc:'รายงานข้อร้องเรียนเจ้าหน้าที่รัฐกระทำการทุจริต ประพฤติมิชอบ',code:'pacc_12_01_1_02',name:'ระเบียบ กฎหมาย มติคณะรัฐมนตรีที่เกี่ยวข้องกับการตรวจสอบกรณีข้อร้องเรียนเจ้าหน้าที่ของรัฐ',type:'ชุดข้อมูลเดิม',owner:'กอท.',proposal:'เสนอรวม',mw:'ข้อมูล กฎหมาย ระเบียบและคำสั่งของสำนักงาน ป.ป.ท.',disc:'เสนอรวม'},
+ {proc:'การตรวจสอบโครงการรัฐที่กำหนดวงเงินสูงเกินจริงหรือไม่คุ้มค่า',code:'pacc_12_01_1_03',name:'ระเบียบ กฎหมาย มติคณะรัฐมนตรี ที่ใช้ในการตรวจสอบโครงการรัฐที่กำหนดวงเงินสูงเกินจริงหรือไม่คุ้มค่า',type:'ชุดข้อมูลเดิม',owner:'กอท.',proposal:'เสนอรวม',mw:'ข้อมูล กฎหมาย ระเบียบและคำสั่งของสำนักงาน ป.ป.ท.',disc:'เสนอรวม'},
+ {proc:'การตรวจสอบโครงการรัฐที่กำหนดวงเงินสูงเกินจริงหรือไม่คุ้มค่า',code:'pacc_12_01_1_04',name:'ช่องทางการร้องเรียนโครงการของรัฐที่กำหนดวงเงินสูงเกินจริงหรือไม่คุ้มค่า',type:'ชุดข้อมูลเดิม',owner:'กอท.',proposal:'เสนอรวม',mw:'ข้อมูลช่องทางรับเรื่องร้องเรียน สำนักงาน ป.ป.ท.',disc:'เสนอรวม'},
+ {proc:'การตรวจสอบ กรณีร้องเรียนวิธีปฏิบัติหรือการดำเนินงานของหน่วยงานรัฐ',code:'pacc_12_01_1_05',name:'ระเบียบ กฎหมาย มติคณะรัฐมนตรีที่เกี่ยวข้องกับการตรวจสอบ กรณีร้องเรียนวิธีปฏิบัติ',type:'ชุดข้อมูลเดิม',owner:'กอท.',proposal:'เสนอรวม',mw:'ข้อมูล กฎหมาย ระเบียบและคำสั่งของสำนักงาน ป.ป.ท.',disc:'เสนอรวม'},
+ {proc:'การตรวจสอบ กรณีร้องเรียนวิธีปฏิบัติหรือการดำเนินงานของหน่วยงานรัฐ',code:'pacc_12_01_1_06',name:'ช่องทางการรับเรื่องร้องเรียน กรณีวิธีปฏิบัติหรือการดำเนินงานของหน่วยงานรัฐ',type:'ชุดข้อมูลเดิม',owner:'กอท.',proposal:'เสนอรวม',mw:'ข้อมูลช่องทางรับเรื่องร้องเรียน สำนักงาน ป.ป.ท.',disc:'เสนอรวม'},
+ {proc:'การวางระบบประเมินความเสี่ยงการทุจริตของหน่วยงานภาครัฐ',code:'pacc_29_01_1_01',name:'ข้อมูลหน่วยงานเป้าหมายประเมินความเสี่ยงการทุจริตภาครัฐ',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'เปิดเผย'},
+ {proc:'การวางระบบประเมินความเสี่ยงการทุจริตของหน่วยงานภาครัฐ',code:'pacc_29_01_1_02',name:'ข้อมูลประเภทความเสี่ยง',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'เปิดเผย'},
+ {proc:'การวางระบบประเมินความเสี่ยงการทุจริตของหน่วยงานภาครัฐ',code:'pacc_29_01_5_03',name:'คู่มือแนวทางการประเมินความเสี่ยงการทุจริต',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'เปิดเผย'},
+ {proc:'การรายงานแผนการบริหารความเสี่ยงของหน่วยงานภาครัฐ',code:'pacc_29_02_1_01',name:'ข้อมูลแผนบริหารความเสี่ยงด้านการพิจารณาอนุมัติ อนุญาตของทางราชการ',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'เปิดเผย'},
+ {proc:'การรายงานแผนการบริหารความเสี่ยงของหน่วยงานภาครัฐ',code:'pacc_29_02_1_02',name:'ข้อมูลแผนบริหารความเสี่ยงด้านการใช้อำนาจและตำแหน่งหน้าที่',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'เปิดเผย'},
+ {proc:'การรายงานแผนการบริหารความเสี่ยงของหน่วยงานภาครัฐ',code:'pacc_29_02_1_03',name:'ข้อมูลแผนบริหารความเสี่ยงด้านการใช้จ่ายงบประมาณ',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'เปิดเผย'},
+ {proc:'การรายงานแผนการบริหารความเสี่ยงของหน่วยงานภาครัฐ',code:'pacc_29_02_2_04',name:'สถิติการรายงานแผนความเสี่ยงรายหน่วยงานระดับกระทรวง',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'เปิดเผย'},
+ {proc:'การรายงานแผนการบริหารความเสี่ยงของหน่วยงานภาครัฐ',code:'pacc_29_02_2_05',name:'สถิติการรายงานแผนความเสี่ยงแยกตามประเภทหน่วยงาน',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'เปิดเผย'},
+ {proc:'การรายงานแผนการบริหารความเสี่ยงของหน่วยงานภาครัฐ',code:'pacc_29_02_1_06',name:'สรุปรายงานผลการวิเคราะห์แผนการบริหารความเสี่ยงของหน่วยงานภาครัฐ',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'ไม่เปิดเผย'},
+ {proc:'การรายงานผลการบริหารความเสี่ยงหน่วยงานภาครัฐ',code:'pacc_29_03_1_01',name:'ข้อมูลผลการบริหารความเสี่ยงด้านการพิจารณาอนุมัติ อนุญาตของทางราชการ',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'ไม่เปิดเผย'},
+ {proc:'การรายงานผลการบริหารความเสี่ยงหน่วยงานภาครัฐ',code:'pacc_29_03_1_02',name:'ข้อมูลผลบริหารความเสี่ยงด้านการใช้อำนาจและตำแหน่งหน้าที่',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'ไม่เปิดเผย'},
+ {proc:'การรายงานผลการบริหารความเสี่ยงหน่วยงานภาครัฐ',code:'pacc_29_03_1_03',name:'ข้อมูลผลบริหารความเสี่ยงด้านโครงการจัดซื้อจัดจ้าง',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'ไม่เปิดเผย'},
+ {proc:'การรายงานผลการบริหารความเสี่ยงหน่วยงานภาครัฐ',code:'pacc_29_03_5_04',name:'สรุปรายงานผลการวิเคราะห์ผลการบริหารความเสี่ยงของหน่วยงานภาครัฐ',type:'ชุดข้อมูลเดิม',owner:'กบส.',proposal:'คงเดิม',mw:'',disc:'ไม่เปิดเผย'},
+ {proc:'การบริหารจัดการองค์กร',code:'pacc_01_01_1_01',name:'ข้อมูลผู้บริหาร',type:'ชุดข้อมูลใหม่',owner:'สลธ.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การจัดทำแผนยุทธศาสตร์สำนักงาน ป.ป.ท.',code:'pacc_11_01_1_03',name:'แผนยุทธศาสตร์ / แผนพัฒนาหน่วยงาน',type:'ชุดข้อมูลใหม่',owner:'กยผ.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การจัดทำผลการดำเนินงานตามแผนงาน สำนักงาน ป.ป.ท.',code:'pacc_11_02_1_01',name:'รายงานผลการดำเนินงาน ปี 2568',type:'ชุดข้อมูลใหม่',owner:'กยผ.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การรวบรวมข้อมูลการขอรับบริการสำนักงาน ป.ป.ท.',code:'pacc_25_01_5_01',name:'คู่มือการขอรับบริการสำหรับผู้มาติดต่อ',type:'ชุดข้อมูลใหม่',owner:'ศปท.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การจัดการเรื่องร้องเรียนการทุจริตและประพฤติมิชอบ สำนักงาน ป.ป.ท.',code:'pacc_25_02_5_01',name:'แนวปฏิบัติจัดการเรื่องร้องเรียนทุจริต',type:'ชุดข้อมูลใหม่',owner:'ศปท.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การจัดการเรื่องร้องเรียนการทุจริตและประพฤติมิชอบ สำนักงาน ป.ป.ท.',code:'pacc_25_02_1_02',name:'สถิติเรื่องร้องเรียนทุจริต ปี 2568',type:'ชุดข้อมูลใหม่',owner:'ศปท.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+ {proc:'การบริหารความเสี่ยงการทุจริตสำนักงาน ป.ป.ท.',code:'pacc_25_03_4_01',name:'รายงานผลตามแผนบริหารความเสี่ยงทุจริต ปี 2568',type:'ชุดข้อมูลใหม่',owner:'ศปท.',proposal:'ชุดข้อมูลใหม่',mw:'',disc:'เปิดเผย'},
+];
+
+// ════ AGGREGATE ════
+const PMAP={};
+ALL.forEach(d=>{
+  if(!PMAP[d.proc])PMAP[d.proc]={name:d.proc,items:[],n:0,o:0,opn:0,sht:0,merg:0};
+  const p=PMAP[d.proc];p.items.push(d);
+  d.type==='ชุดข้อมูลใหม่'?p.n++:p.o++;
+  if(d.disc==='เปิดเผย')p.opn++;else if(d.disc==='ไม่เปิดเผย')p.sht++;else if(d.disc==='เสนอรวม')p.merg++;
+});
+const PROCS=Object.values(PMAP).sort((a,b)=>b.items.length-a.items.length);
+
+const OWNERS=['กบค.','กบส.','กอท.','ศทส.','ศปท.','กยผ.','กกม.','สลธ.'];
+const OMAP={};
+OWNERS.forEach(o=>{OMAP[o]={n:0,old:0,opn:0,sht:0,merg:0};});
+ALL.forEach(d=>{
+  const o=OMAP[d.owner];if(!o)return;
+  d.type==='ชุดข้อมูลใหม่'?o.n++:o.old++;
+  if(d.disc==='เปิดเผย')o.opn++;else if(d.disc==='ไม่เปิดเผย')o.sht++;else if(d.disc==='เสนอรวม')o.merg++;
+});
+
+const PCOLORS={'ชุดข้อมูลใหม่':'#378ADD','คงเดิม':'#C9A227','เสนอรวม':'#7F77DD'};
+const PRMAP={};
+ALL.forEach(d=>{
+  const k=d.proposal||'ไม่ระบุ';
+  if(!PRMAP[k])PRMAP[k]={label:k,items:[]};
+  PRMAP[k].items.push(d);
+});
+const PROPS=Object.values(PRMAP).sort((a,b)=>b.items.length-a.items.length);
+
+// ════ HELPERS ════
+const pill=(t,c)=>`<span class="pill ${c}">${t}</span>`;
+const tPill=t=>t==='ชุดข้อมูลใหม่'?pill('ใหม่','p-new'):pill('เดิม','p-old');
+const dPill=d=>{
+  if(d==='เปิดเผย')return pill('เปิดเผย','p-opn');
+  if(d==='ไม่เปิดเผย')return pill('ไม่เปิดเผย','p-sht');
+  if(d==='เสนอรวม')return pill('เสนอรวม','p-merge');
+  return'';
+};
+
+// ════ PROCESS TABLE ════
+const tb=document.getElementById('procBody');
+const mx=PROCS[0].items.length;
+PROCS.forEach(p=>{
+  const tr=document.createElement('tr');tr.className='pr';
+  tr.innerHTML=`
+    <td style="padding:4px 3px"><span class="arrow">▶</span></td>
+    <td class="pr-name">${p.name}</td>
+    <td style="text-align:center;font-size:14px;font-weight:800;color:var(--navy)">${p.items.length}</td>
+    <td><div class="bw"><div class="bf" style="width:${p.items.length/mx*100}%"></div></div></td>
+    <td>${p.n>0?pill('ใหม่ '+p.n,'p-new'):''} ${p.o>0?pill('เดิม '+p.o,'p-old'):''}</td>
+    <td>${p.opn>0?pill('เปิด '+p.opn,'p-opn'):''} ${p.sht>0?pill('ลับ '+p.sht,'p-sht'):''} ${p.merg>0?pill('เสนอรวม '+p.merg,'p-merge'):''}`;
+  tb.appendChild(tr);
+  const dr=document.createElement('tr');dr.className='dr';
+  const rows=p.items.map(d=>`<div class="di">
+    <div class="di-code">${d.code}</div>
+    <div class="di-name">${d.name}
+      <div class="di-tags">${tPill(d.type)} ${dPill(d.disc)}${d.mw?` <span class="di-merge">→ รวมกับ: ${d.mw.trim()}</span>`:''}</div>
+    </div>
+    <div class="di-own">${d.owner}</div>
+  </div>`).join('');
+  dr.innerHTML=`<td class="dr-cell" colspan="6"><div class="drill-inner">${rows}</div></td>`;
+  tb.appendChild(dr);
+  tr.addEventListener('click',()=>{
+    const was=tr.classList.contains('active');
+    document.querySelectorAll('.pr').forEach(r=>r.classList.remove('active'));
+    document.querySelectorAll('.dr').forEach(r=>r.classList.remove('open'));
+    if(!was){tr.classList.add('active');dr.classList.add('open');}
+  });
+});
+
+// ════ PROPOSAL LIST ════
+const pl=document.getElementById('propList');
+const TOTAL_ALL=ALL.length; // 50 — use absolute scale so bars are proportional
+PROPS.forEach(p=>{
+  const color=PCOLORS[p.label]||'#888';
+  const div=document.createElement('div');div.className='prop-item';
+  div.innerHTML=`
+    <div class="prop-dot" style="background:${color}"></div>
+    <div class="prop-lbl">${p.label}</div>
+    <div class="prop-bar-bg"><div class="prop-bar-fill" style="width:${p.items.length/TOTAL_ALL*100}%;background:${color}"></div></div>
+    <div class="prop-count">${p.items.length}</div>`;
+  div.addEventListener('click',()=>openModal(p.label,p.items,color));
+  pl.appendChild(div);
+});
+
+// ════ SVG CHARTS ════
+// store click callbacks by chart id to avoid inline toString issues
+const _chartCallbacks={};
+
+function makeSvgBarChart(containerId, rows, datasets, colors, onBarClick, sharedMax) {
+  const BAR_H=20, GAP=6, LBL_W=52, PAD_R=52, MIN_BW=6;
+  const W=460, chartW=W-LBL_W-PAD_R;
+  const maxVal = sharedMax || Math.max(...rows.map((_,i)=>datasets.reduce((s,ds)=>s+ds[i],0)));
+  const H=rows.length*(BAR_H+GAP)+GAP+6;
+  if(onBarClick) _chartCallbacks[containerId]=onBarClick;
+  let svg='';
+  rows.forEach((lbl,i)=>{
+    const y=GAP+6+i*(BAR_H+GAP);
+    svg+=`<text x="${LBL_W-6}" y="${y+BAR_H/2+4}" text-anchor="end" font-size="11" font-weight="700" fill="#002060">${lbl}</text>`;
+    svg+=`<rect x="${LBL_W}" y="${y}" width="${chartW}" height="${BAR_H}" fill="#eef0f6" rx="3"/>`;
+    let xOff=LBL_W, total=0;
+    const segs=[];
+    datasets.forEach((ds,di)=>{
+      const v=ds[i]; if(v===0) return;
+      total+=v;
+      const bw=Math.max(maxVal>0?v/maxVal*chartW:0, MIN_BW);
+      segs.push({v,bw,di,xOff,color:colors[di]});
+      xOff+=bw;
+    });
+    // draw bars — use data-* attributes for click, no inline function
+    segs.forEach(s=>{
+      const clickable=onBarClick?`data-cid="${containerId}" data-lbl="${lbl.replace(/"/g,'&quot;')}" data-di="${s.di}" style="cursor:pointer"`:'';
+      svg+=`<rect class="svg-bar" x="${s.xOff}" y="${y}" width="${s.bw}" height="${BAR_H}" fill="${s.color}" rx="3" ${clickable}/>`;
+    });
+    // labels
+    segs.forEach(s=>{
+      if(s.bw>=24){
+        svg+=`<text x="${s.xOff+s.bw/2}" y="${y+BAR_H/2+4}" text-anchor="middle" font-size="9.5" fill="white" font-weight="700" pointer-events="none">${s.v}</text>`;
+      } else if(s.v>0){
+        svg+=`<text x="${s.xOff+s.bw/2}" y="${y-3}" text-anchor="middle" font-size="8.5" fill="${s.color}" font-weight="700" pointer-events="none">${s.v}</text>`;
+      }
+    });
+    svg+=`<text x="${LBL_W+chartW+8}" y="${y+BAR_H/2+4}" font-size="10.5" fill="#1a2a4a" font-weight="800" pointer-events="none">${total}</text>`;
+  });
+  document.getElementById(containerId).innerHTML=
+    `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">${svg}</svg>`;
+}
+
+// single delegated listener for all SVG bar clicks
+document.addEventListener('click',function(e){
+  const bar=e.target.closest('.svg-bar[data-cid]');
+  if(!bar) return;
+  const cid=bar.getAttribute('data-cid');
+  const lbl=bar.getAttribute('data-lbl');
+  const di=parseInt(bar.getAttribute('data-di'));
+  const cb=_chartCallbacks[cid];
+  if(cb) cb(lbl,di);
+});
+
+// compute shared max across BOTH charts so scales match
+const SHARED_MAX = Math.max(
+  ...OWNERS.map(t => OMAP[t].n + OMAP[t].old),      // type chart totals
+  ...OWNERS.map(t => OMAP[t].opn + OMAP[t].sht + OMAP[t].merg) // disc chart totals
+);
+
+// Owner type chart (clickable)
+makeSvgBarChart(
+  'ownerTypeWrap',
+  OWNERS,
+  [OWNERS.map(t=>OMAP[t].n), OWNERS.map(t=>OMAP[t].old)],
+  ['#378ADD','#C9A227'],
+  function(tag,dsIdx){
+    const typeFilter=dsIdx===0?'ชุดข้อมูลใหม่':'ชุดข้อมูลเดิม';
+    const items=ALL.filter(d=>d.owner===tag&&d.type===typeFilter);
+    if(items.length)openModal(tag+' — '+typeFilter,items,dsIdx===0?'#378ADD':'#C9A227');
+  },
+  SHARED_MAX
+);
+
+// Owner disclosure chart (same scale)
+makeSvgBarChart(
+  'ownerDiscWrap',
+  OWNERS,
+  [OWNERS.map(t=>OMAP[t].opn), OWNERS.map(t=>OMAP[t].sht), OWNERS.map(t=>OMAP[t].merg)],
+  ['#1D9E75','#E24B4A','#7F77DD'],
+  null,
+  SHARED_MAX
+);
+
+// ════ MODAL ════
+function openModal(title,items,color){
+  document.getElementById('mTitle').textContent=title+' — '+items.length+' ชุดข้อมูล';
+  document.getElementById('mTitle').style.borderLeftColor=color;
+  document.getElementById('mBody').innerHTML=items.map(d=>`<div class="mi">
+    <div class="mi-code">${d.code}</div>
+    <div>
+      <div class="mi-name">${d.name}</div>
+      <div class="mi-tags">${tPill(d.type)} ${dPill(d.disc)} <span class="pill p-gray">${d.owner}</span></div>
+      ${d.mw?`<span class="mi-merge">→ เสนอรวมกับ: ${d.mw.trim()}</span>`:''}
+      <span class="mi-proc">${d.proc}</span>
+    </div>
+  </div>`).join('');
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal(e){
+  if(!e||e.target===document.getElementById('overlay'))
+    document.getElementById('overlay').classList.remove('open');
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('overlay').classList.remove('open');});
+
+// ════ KPI DRILLDOWN ════
+const kpiDefs = [
+  {id:'kpi-tot', label:'ชุดข้อมูลทั้งหมด',  color:'#002060', filter: ()=>ALL},
+  {id:'kpi-new', label:'ชุดข้อมูลใหม่',      color:'#378ADD', filter: ()=>ALL.filter(d=>d.type==='ชุดข้อมูลใหม่')},
+  {id:'kpi-old', label:'ชุดข้อมูลเดิม',      color:'#C9A227', filter: ()=>ALL.filter(d=>d.type==='ชุดข้อมูลเดิม')},
+  {id:'kpi-opn', label:'เปิดเผยได้',          color:'#1D9E75', filter: ()=>ALL.filter(d=>d.disc==='เปิดเผย')},
+  {id:'kpi-sht', label:'ไม่เปิดเผย',          color:'#E24B4A', filter: ()=>ALL.filter(d=>d.disc==='ไม่เปิดเผย')},
+  {id:'kpi-net', label:'ชุดข้อมูลคงเหลือสุทธิ (หลังหักเสนอรวม)', color:'#2D7D46', filter: ()=>ALL.filter(d=>d.disc!=='เสนอรวม')},
+];
+kpiDefs.forEach(({id, label, color, filter})=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('click',()=>openModal(label, filter(), color));
+});
+</script>
+</body>
+</html>
